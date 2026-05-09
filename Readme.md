@@ -130,135 +130,17 @@ EOF
 chmod +x rebuild.sh
 ```
 
+
 ## Qwen3.6 35B A3B
 
-### Model Information
-- Model: Qwen3.6 35B A3B
-- Quantization: Q4_K_M GGUF
-- Optimized for local inference with TurboQuant llama.cpp
-- Suitable for long-context coding and general reasoning workloads
+See [`llm-configs/qwen3.6-35b-moe/`](llm-configs/qwen3.6-35b-moe/) for the template configurations:
+- Download instructions
+- Server launch command
+- Flag-by-flag explanation
+- Use case recommendations
 
-### Model File
-```
-~/models/Qwen3.6-35B-A3B-UD-Q4_K_M.gguf
-```
 
-### Runtime Configuration
-Optimized for:
-- RTX 4050 Laptop GPU (6 GB VRAM)
-- TurboQuant KV cache
-- CUDA Flash Attention
-- Large context inference
-- Continuous batching
-- Long coding sessions
-
-### Run llama-server
-```bash
-TURBO_LAYER_ADAPTIVE=1 ./build/bin/llama-server \
-  -m ~/models/Qwen3.6-35B-A3B-UD-Q4_K_M.gguf \
-  --host 0.0.0.0 \
-  --port 8084 \
-  -ngl 70 \
-  --n-cpu-moe 999 \
-  -fa on \
-  -ctk turbo3 \
-  -ctv turbo3 \
-  -c 32768 \
-  -n 32768 \
-  -t 10 \
-  -tb 6 \
-  -b 512 \
-  -ub 512 \
-  --prio 2 \
-  --poll 50 \
-  --mlock \
-  --temp 0.6 \
-  --top-p 0.95 \
-  --top-k 20 \
-  --min-p 0.0 \
-  --repeat-penalty 1.0 \
-  --cont-batching \
-  --cache-prompt \
-  --cache-reuse 512 \
-  --jinja \
-  --reasoning-format none \
-  --reasoning-budget 512
-```
-
-### Runtime Notes
-
-#### Expected Performance
-- Expect ~17.45 tokens/sec during generation
-- Performance depends on:
-  - Context size
-  - Prompt complexity
-  - GPU layer offloading
-  - TurboQuant KV cache compression
-  - Concurrent requests
-- TurboQuant KV cache and Flash Attention improve throughput and memory efficiency on RTX 4050 6 GB GPUs
-- Larger context sizes may reduce effective generation speed over time
-
-#### GPU Offloading
-`-ngl 70`
-- Offloads 70 layers to GPU
-- Optimized for RTX 4050 6 GB VRAM
-
-#### TurboQuant KV Cache
-`-ctk turbo3`
-`-ctv turbo3`
-- Enables TurboQuant KV cache compression
-
-#### Adaptive Turbo Layers
-`TURBO_LAYER_ADAPTIVE=1`
-- Dynamically adapts TurboQuant layer behavior
-
-#### Context Length
-`-c 32768`
-- 32k context window
-
-#### CPU / Threading
-`-t 10`
-`-tb 6`
-- Uses 10 CPU threads
-- 6 batch threads
-
-#### Continuous Batching
-`--cont-batching`
-- Better multi-request throughput
-- Reduced latency during interactive usage
-
-#### Prompt Cache
-`--cache-prompt`
-`--cache-reuse 512`
-- Reuses prompt cache for repeated interactions
-
-#### Memory Locking
-`--mlock`
-- Prevents model memory from being swapped to disk
-
-#### Sampling Settings
-- Temperature: 0.6
-- Top-p: 0.95
-- Top-k: 20
-- Repeat penalty: 1.0
-
-#### Reasoning Settings
-`--reasoning-format none`
-`--reasoning-budget 512`
-
-### Access Server
-
-#### Local Endpoint
-```
-http://localhost:8084
-```
-
-#### Network Endpoint
-```
-http://<your-ip>:8084
-```
-
-## Qwen3-Coder 30B A3B Instruct
+## Qwen3-Coder 30B A3B Instruct (Pending to refactor)
 
 ### Model Information
 - Model: Qwen3-Coder 30B A3B Instruct
