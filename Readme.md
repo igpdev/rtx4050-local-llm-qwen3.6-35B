@@ -131,9 +131,9 @@ chmod +x rebuild.sh
 ```
 
 
-## Qwen3.6 35B A3B
+## Qwen3.6-35B-A3B-UD-Q4_K_M
 
-See [`llm-configs/qwen3.6-35b-moe/`](llm-configs/qwen3.6-35b-moe/) for the template configurations:
+See [`Qwen3.6-35B-A3B-UD-Q4_K_M-coding-optimized.md`](turbollama-configs/Qwen3.6-35B-A3B-UD-Q4_K_M-coding-optimized.md) for the template configuration.
 - Download instructions
 - Server launch command
 - Flag-by-flag explanation
