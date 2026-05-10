@@ -170,9 +170,11 @@ TURBO_LAYER_ADAPTIVE=1 ./build/bin/llama-server \
   Caches the KV state of the system prompt.
   Since agent frameworks often resend the same system prompt repeatedly, this avoids reprocessing it every request and significantly improves performance.
 
-- `--ctx-checkpoints 10`
+- `--ctx-checkpoints 7`
   Saves periodic KV-cache checkpoints.
   Long sessions can restore state quickly without rebuilding the entire accumulated context from scratch.
+  Tuned to 7 (vs 10) to reduce VRAM pressure on 6 GB mobile GPU while still covering append-forward agentic context patterns.
+
 
 - `--jinja`
   Enables Jinja templating support required for Qwen3 tool-call formatting.
