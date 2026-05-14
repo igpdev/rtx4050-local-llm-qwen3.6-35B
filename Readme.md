@@ -133,11 +133,11 @@ chmod +x rebuild.sh
 
 ## Qwen3.6-35B-A3B-UD-Q4_K_M
 
-See [`Qwen3.6-35B-A3B-UD-Q4_K_M-coding-optimized.md`](turbollama-configs/Qwen3.6-35B-A3B-UD-Q4_K_M-coding-optimized.md) for the template configuration.
+See [`Qwen3.6-35B-A3b`](turbollama-configs/Qwen3.6-35b) for the model overview and different configs you can try.
 - Download instructions
-- Server launch command
-- Flag-by-flag explanation
-- Use case recommendations
+- Different launch configs you can try with:
+  - Flag-by-flag explanation
+  - Use case recommendations
 
 
 ## Qwen3-Coder 30B A3B Instruct (Pending to refactor)
