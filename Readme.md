@@ -133,7 +133,7 @@ chmod +x rebuild.sh
 
 ## Qwen3.6-35B-A3B-UD-Q4_K_M
 
-See [`Qwen3.6-35B-A3b`](turbollama-configs/Qwen3.6-35b) for the model overview and different configs you can try.
+See [`Qwen3.6-35B-A3b`](./turbollama-configs/qwen3.6-35b/) for the model overview and different configs you can try.
 - Download instructions
 - Different launch configs you can try with:
   - Flag-by-flag explanation
