@@ -4,13 +4,11 @@ Local LLM inference on RTX 4050 6GB VRAM. Uses two different runtimes: **TurboQu
 
 ## Overview
 
-| Model               | Quant   | Context | KV Cache | Expected Speed | llama.cpp Build  | Primary Use Case |
-|---------------------|---------|---------|----------|----------------|------------------|------------------|
-| Qwen3.6 35B A3B     | Q4_K_M  | 65k     | q4_0     | ~17 t/s        | TurboQuant       | Agentic coding   |
-| Qwen3.6 35B A3B     | IQ4_NL  | 160k    | q8_0     | ~23 t/s        | TurboQuant       | Agentic coding   |
-| Qwen3.6 35B A3B MTP | Q4_K_XL | 100k    | q8_0     | ~30 t/s        | llama.cpp latest | Agentic coding   |
-
-> All models run on the same hardware. The MTP model runs on the official llama.cpp upstream (not TurboQuant) — see [Official llama.cpp](#official-llamacpp) below.
+| Model               | Quant   | Context | KV Cache | Expected Speed | llama.cpp Build    | Primary Use Case |
+|---------------------|---------|---------|----------|----------------|--------------------|------------------|
+| Qwen3.6 35B A3B     | Q4_K_M  | 65k     | q4_0     | ~17 t/s        | TurboQuant         | Agentic coding   |
+| Qwen3.6 35B A3B     | IQ4_NL  | 160k    | q8_0     | ~23 t/s        | TurboQuant         | Agentic coding   |
+| Qwen3.6 35B A3B MTP | Q4_K_XL | 100k    | q8_0     | ~30 t/s        | llama.cpp official | Agentic coding   |
 
 ---
 
@@ -39,113 +37,27 @@ Local LLM inference on RTX 4050 6GB VRAM. Uses two different runtimes: **TurboQu
 
 ## llama.cpp Builds
 
-Two separate runtimes are used depending on the model.
+| Runtime            | Used for       | Repo                                            |
+|--------------------|----------------|-------------------------------------------------|
+| TurboQuant         | Q4_K_M, IQ4_NL | https://github.com/CarapaceUDE/turboquant-llama |
+| Official llama.cpp | MTP Q4_K_XL    | https://github.com/ggml-org/llama.cpp           |
 
-### TurboQuant llama.cpp
-
-Used for: **Qwen3.6 35B A3B Q4_K_M** and **Qwen3.6 35B A3B IQ4_NL**
-
-Repository: https://github.com/CarapaceUDE/turboquant-llama
-
-Optimized for NVIDIA CUDA, Ada Lovelace GPUs, Flash Attention for all quant types, and native CPU performance.
-
-#### Active Backends
-- ggml-cpu
-- ggml-cuda
-
-#### Enabled Features
-- GGML_CUDA=ON
-- GGML_CUDA_FA=ON
-- GGML_CUDA_FA_ALL_QUANTS=ON
-- GGML_CUDA_GRAPHS=ON
-- GGML_CUDA_NCCL=ON
-- GGML_NATIVE=ON
-- GGML_OPENMP=ON
-
-#### Disabled Backends
-- Vulkan · HIP / ROCm · OpenCL · Metal · SYCL · WebGPU
-
-#### Build Configuration
-```bash
-cmake -B build \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_CUDA_ARCHITECTURES=89 \
-  -DGGML_CUDA=ON \
-  -DGGML_NATIVE=ON \
-  -DGGML_CUDA_FA=ON \
-  -DGGML_CUDA_FA_ALL_QUANTS=ON
-cmake --build build -j$(nproc)
-```
-
-#### Rebuild Script
-```bash
-cat > rebuild.sh <<'REBUILD'
-rm -rf build
-cmake -B build \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_CUDA_ARCHITECTURES=89 \
-  -DGGML_CUDA=ON \
-  -DGGML_NATIVE=ON \
-  -DGGML_CUDA_FA=ON \
-  -DGGML_CUDA_FA_ALL_QUANTS=ON
-cmake --build build -j$(nproc)
-REBUILD
-chmod +x rebuild.sh
-```
-
-#### Binary Verification
-```bash
-./build/bin/llama-cli --version
-```
-Expected output:
-```
-ggml_cuda_init: found 1 CUDA devices
-Device 0: NVIDIA GeForce RTX 4050 Laptop GPU
-compute capability 8.9
-```
-
----
-
-### Official llama.cpp
-
-Used for: **Qwen3.6 35B A3B MTP Q4_K_XL**
-
-The official upstream llama.cpp includes MTP (Multi-Token Prediction) support. TurboQuant does not, so this model requires building from the official repo.
-
-Upstream repo: https://github.com/ggml-org/llama.cpp
-
-#### Build Configuration
-```bash
-apt-get update
-apt-get install pciutils build-essential cmake curl libcurl4-openssl-dev -y
-
-git clone https://github.com/ggml-org/llama.cpp
-
-cmake llama.cpp -B llama.cpp/build \
-    -DBUILD_SHARED_LIBS=OFF -DGGML_CUDA=ON
-
-cmake --build llama.cpp/build --config Release -j --clean-first \
-    --target llama-cli llama-mtmd-cli llama-server llama-gguf-split
-
-cp llama.cpp/build/bin/llama-* llama.cpp
-```
-
-Binary location after build: `~/src/llama.cpp/build/bin/llama-server`
+See [`build-instructions.md`](./build-instructions.md) for full build steps, flags, and rebuild scripts.
 
 ---
 
 ## Models & Configs
 
 ### Qwen3.6 35B A3B — Q4_K_M
-- [`qwen3.6-35-config-big-context.md`](./turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/qwen3.6-35-config-big-context.md) — big context launch config
-- [`qwen3.6-35-config-balanced.md`](./turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/qwen3.6-35-config-balanced.md) — balanced launch config
-- [`Qwen3.6-35B-A3B-UD-Q4_K_M-model-overview.md`](./turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/Qwen3.6-35B-A3B-UD-Q4_K_M-model-overview.md) — model overview & download instructions
+- [`qwen3.6-35-config-big-context.md`](./turbollama-configs/A3B-Q4_K_M/qwen3.6-35-config-big-context.md) — big context launch config
+- [`qwen3.6-35-config-balanced.md`](./turbollama-configs/A3B-Q4_K_M/qwen3.6-35-config-balanced.md) — balanced launch config
+- [`Qwen3.6-35B-A3B-UD-Q4_K_M-model-overview.md`](./turbollama-configs/A3B-Q4_K_M/Qwen3.6-35B-A3B-UD-Q4_K_M-model-overview.md) — model overview & download instructions
 
 ### Qwen3.6 35B A3B — IQ4_NL
-- [`ultra-context-q8-23tps.md`](./turbollama-configs/qwen3.6-35b/A3B-IQ4_NL/ultra-context-q8-23tps.md) — ultra-long-context launch config (160K tokens, q8_0 KV)
+- [`ultra-context-q8-23tps.md`](./turbollama-configs/A3B-IQ4_NL/ultra-context-q8-23tps.md) — ultra-long-context launch config (160K tokens, q8_0 KV)
 
 ### Qwen3.6 35B A3B MTP — Q4_K_XL
-- [`high-context-q8-30tps.md`](./turbollama-configs/qwen3.6-35b/A3B-MTP-Q4_K_XL/high-context-q8-30tps.md) — MTP launch config & compilation instructions
+- [`high-context-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q8-30tps.md) — MTP launch config & compilation instructions
 
 ---
 
