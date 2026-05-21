@@ -1,34 +1,30 @@
-# RTX 4050 Local LLM Setup - TurboQuant llama.cpp + Qwen3.6 35B A3B
+# RTX 4050 Local LLM Setup — llama.cpp + Qwen3.6 35B A3B
 
-Local LLM inference on RTX 4050 6GB VRAM using TurboQuant llama.cpp with Qwen3.6 35B A3B GGUF
+Local LLM inference on RTX 4050 6GB VRAM. Uses two different runtimes: **TurboQuant** (a custom llama.cpp fork) and the **official llama.cpp** upstream, which includes MTP support.
 
 ## Overview
 
-| Model                        | Quant  | Context | GPU Offload | KV Cache | Expected Speed | Primary Use Case            |
-|------------------------------|--------|---------|-------------|----------|----------------|-----------------------------|
-| Qwen3.6 35B A3B              | Q4_K_M | 32k     | 70 layers   | turbo3   | ~17.45 t/s     | Long-context reasoning/chat |
-| Qwen3-Coder 30B A3B Instruct | Q4_K_M | 64k     | auto        | q4_0     | ~25 t/s        | Coding and repository work  |
+| Model               | Quant   | Context | KV Cache | Expected Speed | llama.cpp Build  | Primary Use Case |
+|---------------------|---------|---------|----------|----------------|------------------|------------------|
+| Qwen3.6 35B A3B     | Q4_K_M  | 65k     | q4_0     | ~17 t/s        | TurboQuant       | Agentic sessions |
+| Qwen3.6 35B A3B     | IQ4_NL  | 160k    | q8_0     | ~23 t/s        | TurboQuant       | Agentic coding   |
+| Qwen3.6 35B A3B MTP | Q4_K_XL | 100k    | q8_0     | ~30 t/s        | llama.cpp latest | Agentic Coding   |
+
+> All models run on the same hardware. The MTP model runs on the official llama.cpp upstream (not TurboQuant) — see [Official llama.cpp](#official-llamacpp) below.
+
+---
 
 ## System Specifications
 
 ### Laptop
-- Model: MSI Cyborg 15.6"
-- CPU: Intel Core i7-13620H
-- Original RAM: 16 GB
-- Current RAM: 64 GB
-- Original Storage: 512 GB SSD
-- Current Storage: 1 TB NVMe SSD
-- Dedicated GPU: NVIDIA GeForce RTX 4050 Laptop GPU
+- **Model**: MSI Cyborg 15.6"
+- **CPU**: Intel Core i7-13620H (13th Gen, 10 cores / 16 threads, 6P + 4E, AVX2)
+- **RAM**: 64 GB (upgraded from 16 GB)
+- **Storage**: 1 TB NVMe SSD (upgraded from 512 GB)
+- **GPU**: NVIDIA GeForce RTX 4050 Laptop GPU
+- **OS**: Ubuntu 24.04 LTS · Kernel 6.17 · NVIDIA Proprietary Drivers · GCC 12.4.0
 
-### Hardware
-- CPU: Intel Core i7-13620H (13th Gen)
-  - 10 cores / 16 threads
-  - Hybrid architecture (6P + 4E cores)
-  - AVX2 supported
-- RAM: 64 GB
-- Storage: 1 TB NVMe SSD
-
-### GPUs
+### GPU Details
 
 #### NVIDIA RTX 4050 Laptop GPU
 - Ada Lovelace architecture
@@ -39,31 +35,25 @@ Local LLM inference on RTX 4050 6GB VRAM using TurboQuant llama.cpp with Qwen3.6
 #### Integrated GPU
 - Intel UHD Graphics
 
-### Software Environment
-- OS: Ubuntu 24.04 LTS
-- Kernel: Linux 6.17
-- NVIDIA Proprietary Drivers Installed
-- Compiler: GCC 12.4.0
+---
 
-## TurboQuant llama.cpp
+## llama.cpp Builds
 
-### Repository
-https://github.com/CarapaceUDE/turboquant-llama
+Two separate runtimes are used depending on the model.
 
-### Build Goals
-This build is optimized for:
-- NVIDIA CUDA acceleration
-- Ada Lovelace GPUs (RTX 40-series mobile)
-- Flash Attention
-- Quantized inference performance
-- Native CPU optimizations
-- Release-mode performance
+### TurboQuant llama.cpp
 
-### Active Backends
+Used for: **Qwen3.6 35B A3B Q4_K_M** and **Qwen3.6 35B A3B IQ4_NL**
+
+Repository: https://github.com/CarapaceUDE/turboquant-llama
+
+Optimized for NVIDIA CUDA, Ada Lovelace GPUs, Flash Attention for all quant types, and native CPU performance.
+
+#### Active Backends
 - ggml-cpu
 - ggml-cuda
 
-### Enabled Features
+#### Enabled Features
 - GGML_CUDA=ON
 - GGML_CUDA_FA=ON
 - GGML_CUDA_FA_ALL_QUANTS=ON
@@ -72,15 +62,10 @@ This build is optimized for:
 - GGML_NATIVE=ON
 - GGML_OPENMP=ON
 
-### Disabled Backends
-- Vulkan
-- HIP / ROCm
-- OpenCL
-- Metal
-- SYCL
-- WebGPU
+#### Disabled Backends
+- Vulkan · HIP / ROCm · OpenCL · Metal · SYCL · WebGPU
 
-### Build Configuration
+#### Build Configuration
 ```bash
 cmake -B build \
   -DCMAKE_BUILD_TYPE=Release \
@@ -89,21 +74,29 @@ cmake -B build \
   -DGGML_NATIVE=ON \
   -DGGML_CUDA_FA=ON \
   -DGGML_CUDA_FA_ALL_QUANTS=ON
-
 cmake --build build -j$(nproc)
 ```
 
-### Build Notes
-- CUDA architecture 89 targets Ada Lovelace GPUs
-- Flash Attention enabled for all supported quant types
-- Native CPU optimizations enabled
-- Release build optimized for inference performance
+#### Rebuild Script
+```bash
+cat > rebuild.sh <<'REBUILD'
+rm -rf build
+cmake -B build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_CUDA_ARCHITECTURES=89 \
+  -DGGML_CUDA=ON \
+  -DGGML_NATIVE=ON \
+  -DGGML_CUDA_FA=ON \
+  -DGGML_CUDA_FA_ALL_QUANTS=ON
+cmake --build build -j$(nproc)
+REBUILD
+chmod +x rebuild.sh
+```
 
-### Binary Verification
+#### Binary Verification
 ```bash
 ./build/bin/llama-cli --version
 ```
-
 Expected output:
 ```
 ggml_cuda_init: found 1 CUDA devices
@@ -111,187 +104,59 @@ Device 0: NVIDIA GeForce RTX 4050 Laptop GPU
 compute capability 8.9
 ```
 
-### Rebuild Script
+---
+
+### Official llama.cpp
+
+Used for: **Qwen3.6 35B A3B MTP Q4_K_XL**
+
+The official upstream llama.cpp includes MTP (Multi-Token Prediction) support. TurboQuant does not, so this model requires building from the official repo.
+
+Upstream repo: https://github.com/ggml-org/llama.cpp
+
+#### Build Configuration
 ```bash
-cat > rebuild.sh <<'EOF'
-rm -rf build
+apt-get update
+apt-get install pciutils build-essential cmake curl libcurl4-openssl-dev -y
 
-cmake -B build \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_CUDA_ARCHITECTURES=89 \
-  -DGGML_CUDA=ON \
-  -DGGML_NATIVE=ON \
-  -DGGML_CUDA_FA=ON \
-  -DGGML_CUDA_FA_ALL_QUANTS=ON
+git clone https://github.com/ggml-org/llama.cpp
 
-cmake --build build -j$(nproc)
-EOF
+cmake llama.cpp -B llama.cpp/build \
+    -DBUILD_SHARED_LIBS=OFF -DGGML_CUDA=ON
 
-chmod +x rebuild.sh
+cmake --build llama.cpp/build --config Release -j --clean-first \
+    --target llama-cli llama-mtmd-cli llama-server llama-gguf-split
+
+cp llama.cpp/build/bin/llama-* llama.cpp
 ```
 
+Binary location after build: `~/src/llama.cpp/build/bin/llama-server`
 
-## Qwen3.6-35B-A3B-UD-Q4_K_M
+---
 
-See [`Qwen3.6-35B-A3b`](./turbollama-configs/qwen3.6-35b/) for the model overview and different configs you can try.
+## Models & Configs
+
+### Qwen3.6 35B A3B MTP — Q4_K_XL (faster)
+See [`turbollama-configs/qwen3.6-35b/A3B-MTP-Q4_K_XL/`](./turbollama-configs/qwen3.6-35b/A3B-MTP-Q4_K_XL/) for:
 - Download instructions
-- Different launch configs you can try with:
-  - Flag-by-flag explanation
-  - Use case recommendations
+- Launch config
+
+### Qwen3.6 35B A3B — Q4_K_M
+See [`turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/`](./turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/) for:
+- Download instructions
+- Launch configs
+
+### Qwen3.6 35B A3B — IQ4_NL
+See [`turbollama-configs/qwen3.6-35b/A3B-IQ4_NL/`](./turbollama-configs/qwen3.6-35b/A3B-IQ4_NL/) for:
+- Download instructions
+- Launch configs
 
 
-## Qwen3-Coder 30B A3B Instruct (Pending to refactor)
-
-### Model Information
-- Model: Qwen3-Coder 30B A3B Instruct
-- Quantization: Q4_K_M GGUF
-- Optimized for local coding inference
-- Supports large-context programming workflows
-- Uses DeepSeek-style reasoning format
-
-### Model File
-```
-/home/work/models/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
-```
-
-### Runtime Configuration
-Optimized for:
-- RTX 4050 Laptop GPU (6 GB VRAM)
-- CUDA Flash Attention
-- 64k context inference
-- Continuous batching
-- Long coding sessions
-- Aggressive VRAM fitting
-
-### Run llama-server
-```bash
-llama.cpp/build/bin/llama-server \
-  -m /home/work/models/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf \
-  --host 0.0.0.0 \
-  --port 8084 \
-  -ngl auto \
-  --fit on \
-  -fa on \
-  -ctk q4_0 \
-  -ctv q4_0 \
-  -c 65536 \
-  -n 4096 \
-  --no-context-shift \
-  -t 6 \
-  -tb 8 \
-  -b 4096 \
-  -ub 1024 \
-  --prio 2 \
-  --poll 50 \
-  --mlock \
-  --temp 0.6 \
-  --top-p 0.95 \
-  --top-k 20 \
-  --min-p 0.0 \
-  --repeat-penalty 1.0 \
-  --cont-batching \
-  --cache-prompt \
-  --cache-reuse 256 \
-  --jinja \
-  --reasoning-format deepseek
-```
-
-### Runtime Notes
-
-#### Expected Performance
-- Expect ~25 tokens/sec during generation
-- Performance depends on:
-  - Context size
-  - Prompt complexity
-  - Active GPU offloading
-  - KV cache usage
-  - Concurrent requests
-- Flash Attention and quantized KV cache significantly improve throughput on RTX 4050 6 GB GPUs
-
-#### Automatic GPU Layer Offloading
-`-ngl auto`
-- Automatically determines optimal GPU offload
-- Adapts to available VRAM capacity
-
-#### VRAM Fit Mode
-`--fit on`
-- Attempts to fit the model into available GPU memory
-- Reduces out-of-memory errors on 6 GB GPUs
-
-#### Flash Attention
-`-fa on`
-- Enables CUDA Flash Attention
-- Improves throughput and reduces memory usage
-
-#### KV Cache Quantization
-`-ctk q4_0`
-`-ctv q4_0`
-- Quantized KV cache for lower memory consumption
-
-#### Context Length
-`-c 65536`
-- 64k context window
-- Optimized for large repositories and long chats
-
-#### Context Handling
-`--no-context-shift`
-- Prevents automatic context shifting
-- Maintains stable long-context behavior
-
-#### CPU / Threading
-`-t 6`
-`-tb 8`
-- Uses 6 CPU inference threads
-- Uses 8 batch-processing threads
-
-#### Batch Configuration
-`-b 4096`
-`-ub 1024`
-- Large batch sizes for improved throughput
-
-#### Continuous Batching
-`--cont-batching`
-- Better multi-request concurrency
-- Improved responsiveness during interactive use
-
-#### Prompt Cache
-`--cache-prompt`
-`--cache-reuse 256`
-- Reuses cached prompt states
-- Reduces prompt processing overhead
-
-#### Memory Locking
-`--mlock`
-- Prevents model memory from being swapped to disk
-
-#### Sampling Settings
-- Temperature: 0.6
-- Top-p: 0.95
-- Top-k: 20
-- Repeat penalty: 1.0
-
-#### Reasoning Settings
-`--reasoning-format deepseek`
-- Enables DeepSeek-compatible reasoning output formatting
-
-### Access Server
-
-#### Local Endpoint
-```
-http://localhost:8084
-```
-
-#### Network Endpoint
-```
-http://<your-ip>:8084
-```
+---
 
 ## Screenshots
 
 ![Code](images/img_code.png)
-
 ![Info](images/img_info.png)
-
 ![Qwen CLI](images/img_qwencli.png)
-
 ![Web](images/img_web.png)
