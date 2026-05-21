@@ -6,9 +6,9 @@ Local LLM inference on RTX 4050 6GB VRAM. Uses two different runtimes: **TurboQu
 
 | Model               | Quant   | Context | KV Cache | Expected Speed | llama.cpp Build  | Primary Use Case |
 |---------------------|---------|---------|----------|----------------|------------------|------------------|
-| Qwen3.6 35B A3B     | Q4_K_M  | 65k     | q4_0     | ~17 t/s        | TurboQuant       | Agentic sessions |
+| Qwen3.6 35B A3B     | Q4_K_M  | 65k     | q4_0     | ~17 t/s        | TurboQuant       | Agentic coding   |
 | Qwen3.6 35B A3B     | IQ4_NL  | 160k    | q8_0     | ~23 t/s        | TurboQuant       | Agentic coding   |
-| Qwen3.6 35B A3B MTP | Q4_K_XL | 100k    | q8_0     | ~30 t/s        | llama.cpp latest | Agentic Coding   |
+| Qwen3.6 35B A3B MTP | Q4_K_XL | 100k    | q8_0     | ~30 t/s        | llama.cpp latest | Agentic coding   |
 
 > All models run on the same hardware. The MTP model runs on the official llama.cpp upstream (not TurboQuant) — see [Official llama.cpp](#official-llamacpp) below.
 
@@ -136,21 +136,16 @@ Binary location after build: `~/src/llama.cpp/build/bin/llama-server`
 
 ## Models & Configs
 
-### Qwen3.6 35B A3B MTP — Q4_K_XL (faster)
-See [`turbollama-configs/qwen3.6-35b/A3B-MTP-Q4_K_XL/`](./turbollama-configs/qwen3.6-35b/A3B-MTP-Q4_K_XL/) for:
-- Download instructions
-- Launch config
-
 ### Qwen3.6 35B A3B — Q4_K_M
-See [`turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/`](./turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/) for:
-- Download instructions
-- Launch configs
+- [`qwen3.6-35-config-big-context.md`](./turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/qwen3.6-35-config-big-context.md) — big context launch config
+- [`qwen3.6-35-config-balanced.md`](./turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/qwen3.6-35-config-balanced.md) — balanced launch config
+- [`Qwen3.6-35B-A3B-UD-Q4_K_M-model-overview.md`](./turbollama-configs/qwen3.6-35b/A3B-Q4_K_M/Qwen3.6-35B-A3B-UD-Q4_K_M-model-overview.md) — model overview & download instructions
 
 ### Qwen3.6 35B A3B — IQ4_NL
-See [`turbollama-configs/qwen3.6-35b/A3B-IQ4_NL/`](./turbollama-configs/qwen3.6-35b/A3B-IQ4_NL/) for:
-- Download instructions
-- Launch configs
+- [`ultra-context-q8-23tps.md`](./turbollama-configs/qwen3.6-35b/A3B-IQ4_NL/ultra-context-q8-23tps.md) — ultra-long-context launch config (160K tokens, q8_0 KV)
 
+### Qwen3.6 35B A3B MTP — Q4_K_XL
+- [`high-context-q8-30tps.md`](./turbollama-configs/qwen3.6-35b/A3B-MTP-Q4_K_XL/high-context-q8-30tps.md) — MTP launch config & compilation instructions
 
 ---
 
