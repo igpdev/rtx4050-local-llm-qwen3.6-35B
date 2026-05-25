@@ -61,7 +61,7 @@ See [`build-instructions.md`](./build-instructions.md) for full build steps, fla
 - [`high-context-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q8-30tps.md) — MTP launch config & compilation instructions
 
 ### Qwen3.6 35B A3B MTP — Q4_K_XL (q4_0)
-- [`high-context-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q4-30tps.md) — MTP launch config & compilation instructions
+- [`high-context-q4-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q4-30tps.md) — MTP launch config & compilation instructions
 
 ---
 
