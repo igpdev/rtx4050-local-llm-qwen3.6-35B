@@ -10,7 +10,6 @@ Local LLM inference on RTX 4050 6GB VRAM. Uses two different runtimes: **TurboQu
 | Qwen3.6 35B A3B     | IQ4_NL  | 160k    | q8_0     | ~23 t/s        | TurboQuant         | Agentic coding   |
 | Qwen3.6 35B A3B MTP | Q4_K_XL | 100k    | q8_0     | ~30 t/s        | llama.cpp official | Agentic coding   |
 | Qwen3.6 35B A3B MTP | Q4_K_XL | 100k    | q4_0     | ~30 t/s        | llama.cpp official | Agentic coding   |
-
 ---
 
 ## System Specifications
@@ -59,6 +58,8 @@ See [`build-instructions.md`](./build-instructions.md) for full build steps, fla
 
 ### Qwen3.6 35B A3B MTP — Q4_K_XL
 - [`high-context-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q8-30tps.md) — MTP launch config & compilation instructions
+- [`fast-prefill-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/fast-prefill-q8-30tps.md) — Config with option to get fast prefill (initial prompt)
+
 
 ### Qwen3.6 35B A3B MTP — Q4_K_XL (q4_0)
 - [`high-context-q4-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q4-30tps.md) — MTP launch config & compilation instructions
