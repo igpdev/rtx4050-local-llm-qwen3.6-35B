@@ -11,7 +11,7 @@ args=(
     -ngl 41
     --spec-draft-ngl 0
     --n-cpu-moe 40
-    -b 32768
+    -b 3072
     -ub 3072
     --ctx-size 70000
     -n 8192
