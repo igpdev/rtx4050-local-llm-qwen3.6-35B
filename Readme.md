@@ -1,15 +1,19 @@
 # RTX 4050 Local LLM Setup — llama.cpp + Qwen3.6 35B A3B
 
 Local LLM inference on RTX 4050 6GB VRAM. Uses two different runtimes: **TurboQuant** (a custom llama.cpp fork) and the **official llama.cpp** upstream, which includes MTP support.
+The import thing is to experiment yourself with your own hardware, keep an eye on latest models also as there could be some new versions
+that can give you better performance.
 
 ## Overview
 
 | Model               | Quant   | Context | KV Cache | Expected Speed | llama.cpp Build    | Primary Use Case |
 |---------------------|---------|---------|----------|----------------|--------------------|------------------|
-| Qwen3.6 35B A3B     | Q4_K_M  | 65k     | q4_0     | ~17 t/s        | TurboQuant         | Agentic coding   |
-| Qwen3.6 35B A3B     | IQ4_NL  | 160k    | q8_0     | ~23 t/s        | TurboQuant         | Agentic coding   |
 | Qwen3.6 35B A3B MTP | Q4_K_XL | 100k    | q8_0     | ~30 t/s        | llama.cpp official | Agentic coding   |
 | Qwen3.6 35B A3B MTP | Q4_K_XL | 100k    | q4_0     | ~30 t/s        | llama.cpp official | Agentic coding   |
+| Qwen3.6 35B A3B     | Q4_K_M  | 65k     | q4_0     | ~17 t/s        | TurboQuant         | Agentic coding   |
+| Qwen3.6 35B A3B     | IQ4_NL  | 160k    | q8_0     | ~23 t/s        | TurboQuant         | Agentic coding   |
+|---------------------|---------|---------|----------|----------------|--------------------|------------------|
+
 ---
 
 ## System Specifications
@@ -48,6 +52,11 @@ See [`build-instructions.md`](./build-instructions.md) for full build steps, fla
 
 ## Models & Configs
 
+### Qwen3.6 35B A3B MTP — Q4_K_XL (Recommended if using pi agent, opencode, or hermes agent: fast-prefill)
+- [`fast-prefill-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/fast-prefill-q8-30tps.md) — Config with option to get fast prefill (initial prompt)
+- [`high-context-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q8-30tps.md) — MTP launch config & compilation instructions
+* If you get OOM error, try to lower the --ctx-size from 100k to 75000, or 80000.
+
 ### Qwen3.6 35B A3B — Q4_K_M
 - [`qwen3.6-35-config-big-context.md`](./turbollama-configs/A3B-Q4_K_M/qwen3.6-35-config-big-context.md) — big context launch config
 - [`qwen3.6-35-config-balanced.md`](./turbollama-configs/A3B-Q4_K_M/qwen3.6-35-config-balanced.md) — balanced launch config
@@ -55,11 +64,6 @@ See [`build-instructions.md`](./build-instructions.md) for full build steps, fla
 
 ### Qwen3.6 35B A3B — IQ4_NL
 - [`ultra-context-q8-23tps.md`](./turbollama-configs/A3B-IQ4_NL/ultra-context-q8-23tps.md) — ultra-long-context launch config (160K tokens, q8_0 KV)
-
-### Qwen3.6 35B A3B MTP — Q4_K_XL
-- [`high-context-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q8-30tps.md) — MTP launch config & compilation instructions
-- [`fast-prefill-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/fast-prefill-q8-30tps.md) — Config with option to get fast prefill (initial prompt)
-
 
 ### Qwen3.6 35B A3B MTP — Q4_K_XL (q4_0)
 - [`high-context-q4-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q4-30tps.md) — MTP launch config & compilation instructions

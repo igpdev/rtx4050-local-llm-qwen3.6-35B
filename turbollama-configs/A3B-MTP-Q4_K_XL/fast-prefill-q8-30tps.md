@@ -13,7 +13,7 @@ args=(
     --n-cpu-moe 40
     -b 3072
     -ub 3072
-    --ctx-size 70000
+    --ctx-size 100000
     -n 8192
     --mlock
     --no-mmap
