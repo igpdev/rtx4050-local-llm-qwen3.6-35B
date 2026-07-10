@@ -53,7 +53,7 @@ See [`build-instructions.md`](./build-instructions.md) for full build steps, fla
 ## Models & Configs
 
 ### Qwen3.6 35B A3B MTP — Q4_K_XL (Recommended if using pi agent, opencode, or hermes agent: fast-prefill)
-- [`fast-prefill-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/fast-prefill-q8-30tps.md) — Config with option to get fast prefill (initial prompt)
+- [`fast-prefill-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/fast-prefill-q8-30tps.md) — (The current recommended one) Config with option to get fast prefill (initial prompt).
 - [`high-context-q8-30tps.md`](./turbollama-configs/A3B-MTP-Q4_K_XL/high-context-q8-30tps.md) — MTP launch config & compilation instructions
 * If you get OOM error, try to lower the --ctx-size from 100k to 75000, or 80000.
 
